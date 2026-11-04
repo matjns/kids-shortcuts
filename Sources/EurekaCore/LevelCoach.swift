@@ -21,13 +21,11 @@ public enum LevelChange: Equatable, Sendable {
 }
 
 /// Moves a player between levels by how they are doing. Everyone starts as
-/// an Explorer. There is no picker for kids; a grown-up can override it.
+/// an Explorer. There is no level picker.
 public struct LevelCoach: Codable, Equatable, Sendable {
     public var level: Level = .explorer
     /// Recent results at the current level, oldest first.
     public var recent: [Outcome] = []
-    /// A grown-up pinned the level. Automatic moves are off.
-    public var pinned = false
 
     /// Level up after at least this many puzzles at the level…
     public static let window = 10
@@ -54,7 +52,6 @@ public struct LevelCoach: Codable, Equatable, Sendable {
     public mutating func record(_ outcome: Outcome) -> LevelChange? {
         recent.append(outcome)
         if recent.count > 30 { recent.removeFirst(recent.count - 30) }
-        guard !pinned else { return nil }
 
         let last = recent.suffix(LevelCoach.window)
         if let next = level.next, last.count >= LevelCoach.window {
@@ -78,10 +75,9 @@ public struct LevelCoach: Codable, Equatable, Sendable {
         return nil
     }
 
-    /// Grown-up override from the hidden settings.
-    public mutating func set(_ newLevel: Level, pinned: Bool) {
+    /// Test helper: jump straight to a level.
+    internal mutating func setLevelForTesting(_ newLevel: Level) {
         level = newLevel
-        self.pinned = pinned
         recent = []
     }
 }

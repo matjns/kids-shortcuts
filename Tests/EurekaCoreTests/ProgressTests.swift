@@ -43,16 +43,6 @@ final class ProgressTests: XCTestCase {
         XCTAssertEqual(explorer.level, .explorer, "never below Explorer")
     }
 
-    func testGrownUpPinStopsAutomaticMoves() {
-        var coach = LevelCoach()
-        coach.set(.challenger, pinned: true)
-        for _ in 0..<20 { XCTAssertNil(coach.record(rough)) }
-        XCTAssertEqual(coach.level, .challenger)
-        coach.set(.explorer, pinned: false)
-        for _ in 0..<9 { _ = coach.record(clean) }
-        XCTAssertEqual(coach.record(clean), .up(.adventurer))
-    }
-
     func testStars() {
         let puzzle = PuzzleGenerator.make(.teachersTrick, level: .challenger, seed: 1)
         XCTAssertEqual(StarAward.award(for: puzzle, stats: SolveStats(seconds: 10, steps: 1)).stars, 3)
@@ -85,10 +75,6 @@ final class ProgressTests: XCTestCase {
         XCTAssertFalse(again.newBest)
         XCTAssertEqual(again.streak, 0)
         XCTAssertEqual(progress.bestStreak, 3)
-        progress.allChaptersOpen = true
-        XCTAssertEqual(progress.unlockedChapters.count, 8)
-        progress.resetAll()
-        XCTAssertEqual(progress, PlayerProgress.fresh)
     }
 
     func testChallengeRun() {
@@ -112,7 +98,7 @@ final class ProgressTests: XCTestCase {
         XCTAssertEqual(store.load(), .fresh)
         var progress = PlayerProgress()
         _ = progress.record(PuzzleGenerator.make(.pairUpTen, level: .explorer, seed: 1), stats: SolveStats(seconds: 3))
-        progress.coach.set(.adventurer, pinned: true)
+        progress.coach.setLevelForTesting(.adventurer)
         try store.save(progress)
         XCTAssertEqual(store.load(), progress)
         try Data("not json".utf8).write(to: store.fileURL)

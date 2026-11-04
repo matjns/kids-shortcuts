@@ -52,7 +52,6 @@ final class GameModel {
     var lastChallengeScore = 0
     var newChallengeBest = false
 
-    var showGrownUps = false
     var saveWarning: String?
 
     private let store: ProgressStore
@@ -335,24 +334,6 @@ final class GameModel {
         if speaker.isSpeaking {
             speaker.stopSpeaking(at: .immediate)
         }
-    }
-
-    // MARK: Grown-ups
-
-    func setLevel(_ newLevel: Level, pinned: Bool) {
-        progress.coach.set(newLevel, pinned: pinned)
-        persist()
-    }
-
-    func setAllChaptersOpen(_ open: Bool) {
-        progress.allChaptersOpen = open
-        persist()
-    }
-
-    func resetEverything() {
-        progress.resetAll()
-        persist()
-        goToMap()
     }
 
     func persist() {

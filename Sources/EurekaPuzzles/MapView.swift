@@ -40,9 +40,6 @@ struct RootView: View {
                 model.persist()
             }
         }
-        .sheet(isPresented: $model.showGrownUps) {
-            GrownUpsView(model: model)
-        }
     }
 }
 
@@ -58,12 +55,6 @@ struct MapView: View {
                     Text("Eureka!")
                         .font(Theme.rounded(60, .heavy))
                         .foregroundStyle(Theme.violet)
-                        // Grown-ups: hold Option and triple-click the title.
-                        .onTapGesture(count: 3) {
-                            if NSEvent.modifierFlags.contains(.option) {
-                                model.showGrownUps = true
-                            }
-                        }
                     Text("Every puzzle has a long way and a clever shortcut. Find the shortcut!")
                         .font(Theme.rounded(20, .medium))
                         .foregroundStyle(Theme.ink.opacity(0.75))
@@ -273,60 +264,6 @@ struct ChallengeOverView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-    }
-}
-
-struct GrownUpsView: View {
-    @Bindable var model: GameModel
-    @Environment(\.dismiss) private var dismiss
-    @State var pinned = false
-    @State var chosen: Level = .explorer
-    @State var confirmReset = false
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 18) {
-            Text("For grown-ups").font(Theme.rounded(30, .heavy))
-            Text("Everyone starts as an Explorer. The game moves up a level after 8 clean solves out of the last 10 (and about 2 stars each), and steps back down gently after 4 hard puzzles out of 6.")
-                .font(Theme.rounded(15, .medium))
-                .fixedSize(horizontal: false, vertical: true)
-            Text("Right now: \(model.level.title)\(model.progress.coach.pinned ? " (pinned)" : "")")
-                .font(Theme.rounded(17, .bold))
-            Picker("Level", selection: $chosen) {
-                ForEach(Level.allCases, id: \.self) { level in
-                    Text(level.title).tag(level)
-                }
-            }
-            .pickerStyle(.segmented)
-            Toggle("Pin this level (no automatic moves)", isOn: $pinned)
-            HStack {
-                Button("Use this level") {
-                    model.setLevel(chosen, pinned: pinned)
-                }
-                Spacer()
-            }
-            Divider()
-            Toggle("Open every chapter", isOn: Binding(get: { model.progress.allChaptersOpen }, set: { model.setAllChaptersOpen($0) }))
-            Divider()
-            HStack {
-                Button("Start over…", role: .destructive) { confirmReset = true }
-                Spacer()
-                Button("Done") { dismiss() }
-                    .keyboardShortcut(.defaultAction)
-            }
-        }
-        .padding(28)
-        .frame(width: 520)
-        .onAppear {
-            chosen = model.level
-            pinned = model.progress.coach.pinned
-        }
-        .alert("Erase all stars and go back to Explorer?", isPresented: $confirmReset) {
-            Button("Erase", role: .destructive) {
-                model.resetEverything()
-                dismiss()
-            }
-            Button("Keep", role: .cancel) {}
-        }
     }
 }
 #endif

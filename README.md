@@ -27,16 +27,6 @@ The game moves up on its own:
 - **Gentle step down:** only if 4 of the last 6 puzzles were a real struggle (gave up, 3 or more misses, or all 3 hints). It never goes below Explorer, and stars are never taken away.
 - Progress, stars, streaks and level are remembered on this Mac.
 
-### Grown-ups panel (hidden)
-
-On the map screen, **hold Option and triple-click the "Eureka!" title**. The panel can:
-
-- set the level by hand, and pin it so it doesn't change on its own,
-- open every chapter at once,
-- start over, after a confirmation, which clears all progress.
-
-There is no password. The gesture just keeps it out of the way.
-
 Chapters open in order: solving 3 different puzzles in a chapter opens the next one.
 
 ## Chapters

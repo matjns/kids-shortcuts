@@ -16,8 +16,6 @@ public struct PlayerProgress: Codable, Equatable, Sendable {
     public var currentStreak = 0
     public var bestStreak = 0
     public var challengeBest = 0
-    /// A grown-up opened every chapter.
-    public var allChaptersOpen = false
 
     public init() {}
 
@@ -38,7 +36,7 @@ public struct PlayerProgress: Codable, Equatable, Sendable {
     }
 
     public func isUnlocked(_ chapter: ChapterID) -> Bool {
-        if allChaptersOpen || chapter == .pairs { return true }
+        if chapter == .pairs { return true }
         guard let previous = ChapterID(rawValue: chapter.rawValue - 1) else { return true }
         return isUnlocked(previous) && solvedKinds(in: previous) >= PlayerProgress.solvesToUnlock
     }
@@ -66,10 +64,5 @@ public struct PlayerProgress: Codable, Equatable, Sendable {
         let change = coach.record(Outcome(award: award, stats: stats))
         let unlocked = unlockedChapters.first { !before.contains($0) }
         return RecordResult(award: award, newBest: newBest, levelChange: change, streak: currentStreak, unlocked: unlocked)
-    }
-
-    /// A grown-up's "start over". Clears stars and sends the level back to Explorer.
-    public mutating func resetAll() {
-        self = PlayerProgress()
     }
 }
