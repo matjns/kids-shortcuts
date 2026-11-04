@@ -332,6 +332,12 @@ struct LevelChangeOverlay: View {
     var dismiss: () -> Void
     @State var pop = false
 
+    static func burst(_ index: Int, out: Bool) -> CGSize {
+        guard out else { return .zero }
+        let angle: Double = Double(index) * Double.pi / 6
+        return CGSize(width: cos(angle) * 150, height: sin(angle) * 110)
+    }
+
     var body: some View {
         ZStack {
             Color.black.opacity(0.4).ignoresSafeArea()
@@ -343,7 +349,7 @@ struct LevelChangeOverlay: View {
                             Image(systemName: "star.fill")
                                 .font(.system(size: 26))
                                 .foregroundStyle(Theme.pairColors[index % Theme.pairColors.count])
-                                .offset(x: pop ? cos(Double(index) * .pi / 6) * 150 : 0, y: pop ? sin(Double(index) * .pi / 6) * 110 : 0)
+                                .offset(LevelChangeOverlay.burst(index, out: pop))
                                 .opacity(pop ? 1 : 0)
                         }
                         Image(systemName: "mountain.2.fill")

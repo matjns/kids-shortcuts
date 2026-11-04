@@ -49,6 +49,17 @@ struct PairingView: View {
     var socks: Bool
     var showAutoPair: Bool
 
+    static func summary(_ board: PairingBoard, socks: Bool) -> String {
+        if socks { return "Pairs: \(board.pairs.count)" }
+        let totals: [String] = board.pairSums.map { String($0) }
+        return "Pair totals: " + totals.joined(separator: ", ")
+    }
+
+    static func fill(pair: Int?, selected: Bool) -> Color {
+        if let pair { return Theme.pairColors[pair % Theme.pairColors.count] }
+        return selected ? Theme.sun : Theme.paper
+    }
+
     var body: some View {
         let board = model.pairing
         let perRow = board.numbers.count <= 12 ? board.numbers.count : (board.numbers.count + 1) / 2
@@ -58,14 +69,15 @@ struct PairingView: View {
                 .foregroundStyle(Theme.ink.opacity(0.65))
             LazyVGrid(columns: Array(repeating: GridItem(.fixed(58), spacing: 8), count: max(1, perRow)), spacing: 10) {
                 ForEach(board.numbers.indices, id: \.self) { index in
-                    let pair = board.pairIndex(containing: index)
-                    let selected = board.selected == index
+                    let pair: Int? = board.pairIndex(containing: index)
+                    let selected: Bool = board.selected == index
+                    let fill: Color = PairingView.fill(pair: pair, selected: selected)
                     Button {
                         model.pairing.tap(index)
                     } label: {
                         ZStack {
                             Circle()
-                                .fill(pair.map { Theme.pairColors[$0 % Theme.pairColors.count] } ?? (selected ? Theme.sun : Theme.paper))
+                                .fill(fill)
                             Circle()
                                 .strokeBorder(selected ? Theme.ink : Theme.ink.opacity(0.15), lineWidth: selected ? 3 : 1)
                             if socks {
@@ -85,7 +97,7 @@ struct PairingView: View {
             }
             HStack(spacing: 10) {
                 if !board.pairs.isEmpty {
-                    Text(socks ? "Pairs: \(board.pairs.count)" : "Pair totals: " + board.pairSums.map(String.init).joined(separator: ", "))
+                    Text(PairingView.summary(board, socks: socks))
                         .font(Theme.rounded(18, .bold))
                         .foregroundStyle(Theme.ink)
                 }
@@ -149,6 +161,12 @@ struct OddLayersView: View {
     var count: Int
     @State var shown = 1
 
+    private var layerLabel: String {
+        let odds: [String] = (1...max(1, shown)).map { String(2 * $0 - 1) }
+        let sum: String = odds.joined(separator: " + ")
+        return "Layers: \(shown)   (\(sum))"
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Canvas { context, size in
@@ -164,7 +182,7 @@ struct OddLayersView: View {
             }
             .frame(width: 240, height: 240)
             Stepper(value: $shown, in: 1...max(1, count)) {
-                Text("Layers: \(shown)   (" + (1...shown).map { String(2 * $0 - 1) }.joined(separator: " + ") + ")")
+                Text(layerLabel)
                     .font(Theme.rounded(16, .semibold))
                     .foregroundStyle(Theme.ink)
             }
